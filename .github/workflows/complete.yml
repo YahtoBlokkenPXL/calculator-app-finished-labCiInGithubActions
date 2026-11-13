@@ -31,16 +31,12 @@ jobs:
         run: npm install
 
       - name: Run unit tests with coverage
-        run: npm test -- --coverage --coverageReporters=cobertura --coverageReporters=text
+        run: npm test -- --coverage
 
-      - name: Inspect coverage report
-        run: |
-          echo "Bestanden in coverage:"
-          ls -lah coverage/
-          echo "Eerste regels van het Cobertura-bestand:"
-          head -n 40 coverage/cobertura-coverage.xml
-          echo "Zoeken naar package-elementen:"
-          grep -n "<package" coverage/cobertura-coverage.xml || true
+      - name: Publish Jest coverage report
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # 7. Bouw de applicatie
       - name: Build application
