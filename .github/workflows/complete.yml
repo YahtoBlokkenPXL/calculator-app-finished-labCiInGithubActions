@@ -30,22 +30,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4. Voer tests uit en genereer coverage
       - name: Run unit tests with coverage
-        run: npm test -- --coverage --coverageReporters=text --coverageReporters=cobertura
+        run: npm test -- --coverage --coverageReporters=cobertura --coverageReporters=text
 
-      # 5. Controleer of het coverage-bestand bestaat
-      - name: Verify coverage report
-        run: ls -lah coverage/
-
-      # 6. Genereer een coverage-samenvatting
-      - name: Code coverage summary
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: coverage/cobertura-coverage.xml
-          badge: true
-          format: markdown
-          output: both
+      - name: Inspect coverage report
+        run: |
+          echo "Bestanden in coverage:"
+          ls -lah coverage/
+          echo "Eerste regels van het Cobertura-bestand:"
+          head -n 40 coverage/cobertura-coverage.xml
+          echo "Zoeken naar package-elementen:"
+          grep -n "<package" coverage/cobertura-coverage.xml || true
 
       # 7. Bouw de applicatie
       - name: Build application
