@@ -26,11 +26,12 @@ jobs:
                ".github/*" \
                "calculator-app.zip"
 
-      - name: Run unit tests
-        run: npm test
+      
+      - name: Run unit tests with coverage
+        run: npm test -- --coverage --coverageReporters=text --coverageReporters=cobertura
 
-      - name: Generate coverage report
-        run: npm test -- --coverage
+      - name: Verify coverage report
+        run: ls -lah coverage/
 
       - name: Code coverage summary
         uses: irongut/CodeCoverageSummary@v1.3.0
