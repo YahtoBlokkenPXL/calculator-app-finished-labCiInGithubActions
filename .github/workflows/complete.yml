@@ -35,11 +35,50 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      
       - name: Run unit tests with coverage
-        run: npm test -- --coverage
+        run: npm test -- --coverage --coverageReporters=text --coverageReporters=json-summary --coverageReporters=html
 
-      - name: Run unit tests with coverage
-        run: npm test -- --coverage
+      - name: Generate Code Coverage Report
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          const report = JSON.parse(
+            fs.readFileSync('coverage/coverage-summary.json', 'utf8')
+          );
+
+          const files = Object.entries(report)
+            .filter(([name]) => name !== 'total');
+
+          const metrics = ['statements', 'branches', 'functions', 'lines'];
+
+          function row(name, data) {
+            const values = metrics.map(metric => {
+              const value = data[metric];
+              return `${value.pct.toFixed(2)}%`;
+            });
+
+            return `| ${name} | ${values.join(' | ')} |`;
+          }
+
+          let markdown = `## Code Coverage Report 📊
+
+          Here are the details about the code coverage for the latest commit.
+
+          | File | Statements | Branches | Functions | Lines |
+          |---|---:|---:|---:|---:|
+          `;
+
+          for (const [name, data] of files) {
+            markdown += row(name.split('/').pop(), data) + '\n';
+          }
+
+          markdown += row('**All Files**', report.total) + '\n';
+
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdown);
+          NODE
 
       - name: Upload coverage report
         if: always()
@@ -47,8 +86,8 @@ jobs:
         with:
           name: jest-coverage-report
           path: coverage/
-          if-no-files-found: warn
           retention-days: 7
+
 
       # 7. Bouw de applicatie
       - name: Build application
