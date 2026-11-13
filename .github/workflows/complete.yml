@@ -28,3 +28,14 @@ jobs:
 
       - name: Run unit tests
         run: npm test
+
+      - name: Generate coverage report
+        run: npm test -- --coverage
+
+      - name: Code coverage summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage/cobertura-coverage.xml
+          badge: true
+          format: markdown
+          output: both
