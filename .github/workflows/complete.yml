@@ -38,10 +38,17 @@ jobs:
       - name: Run unit tests with coverage
         run: npm test -- --coverage
 
-      - name: Publish Jest coverage report
-        uses: ArtiomTr/jest-coverage-report-action@v2
+      - name: Run unit tests with coverage
+        run: npm test -- --coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: jest-coverage-report
+          path: coverage/
+          if-no-files-found: warn
+          retention-days: 7
 
       # 7. Bouw de applicatie
       - name: Build application
